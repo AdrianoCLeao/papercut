@@ -1,7 +1,6 @@
 use winit::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
-    platform::run_return::EventLoopExtRunReturn,
     window::WindowBuilder,
 };
 use crate::window::component::{Component, LayoutDirection};
@@ -14,7 +13,7 @@ pub struct Window {
 
 impl Window {
     pub fn new(title: &str, width: u32, height: u32) -> Self {
-        let event_loop = EventLoop::new();
+        let event_loop = EventLoop::new().unwrap();
         let winit_window = WindowBuilder::new()
             .with_title(title)
             .with_inner_size(winit::dpi::LogicalSize::new(width, height))
@@ -48,22 +47,10 @@ impl Window {
         let mut event_loop = self.event_loop;
         let winit_window = self.winit_window;
     
-        event_loop.run_return(move |event, _, control_flow| {
-            *control_flow = ControlFlow::Wait;
-    
-            match event {
-                Event::WindowEvent {
-                    event: WindowEvent::CloseRequested,
-                    ..
-                } => {
-                    println!("Window close requested, exiting...");
-                    *control_flow = ControlFlow::Exit;
-                }
-                Event::MainEventsCleared => {
-                    render_component(&root, 0);
-                }
-                _ => (),
-            }
+        let _ = event_loop.run(|event, elwt| {
+            
+
+
         });
     }
 
