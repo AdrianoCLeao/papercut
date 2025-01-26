@@ -9,7 +9,7 @@ use floem::{
 
 fn right(window_maximized: RwSignal<bool>) -> impl View {
     let background_color = Color::rgb8(0xFF, 0x00, 0x00);
-    let text_color = Color::rgb8(0xFF, 0xFF, 0xFF);
+    let text_color = Color::rgb8(0x7A, 0x7A, 0x7A);
     stack((
         drag_window_area(empty()).style(|s| s.height_pct(100.0).flex_basis(0.0).flex_grow(1.0)),
         stack((container(label(|| "1".to_string()).style(move |s| {
@@ -38,8 +38,8 @@ fn right(window_maximized: RwSignal<bool>) -> impl View {
 }
 
 pub fn navbar() -> Stack {
-    let background_color = Color::rgb8(0x28, 0x2C, 0x34);
-    let text_color = Color::rgb8(0xFF, 0xFF, 0xFF);
+    let background_color = Color::rgb8(0x1F, 0x1F, 0x1F);
+    let text_color = Color::rgb8(0x7A, 0x7A, 0x7A);
     let window_maximized = create_rw_signal(false);
 
     let navbar_title = label(|| "Navbar".to_string())
