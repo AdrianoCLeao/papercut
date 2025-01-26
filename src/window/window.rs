@@ -1,12 +1,12 @@
 use floem::{
-    keyboard::{Key, NamedKey},reactive::SignalUpdate, views::{button, stack, Decorators}, IntoView, View
+    keyboard::{Key, NamedKey}, reactive::SignalUpdate, views::{button, stack, Decorators}, window::WindowId, IntoView, View
 };
 use crate::window::component::EditorComponents;
 use crate::components::navbar::navbar;
 use crate::components::left_panel::left_panel;
 use crate::components::right_panel::right_panel;
 
-pub fn create_window(components: EditorComponents) -> impl IntoView {
+pub fn create_window(components: EditorComponents, window_id: WindowId) -> impl IntoView {
     let EditorComponents {
         editor_a,
         editor_b,
@@ -15,7 +15,7 @@ pub fn create_window(components: EditorComponents) -> impl IntoView {
         hide_gutter_b,
     } = components;
 
-    let navbar = navbar();
+    let navbar = navbar(window_id);
     let left_sidebar = left_panel();
     let right_sidebar = right_panel();
 
