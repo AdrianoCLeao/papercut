@@ -1,5 +1,5 @@
 use floem::{
-    keyboard::{Key, NamedKey},reactive::SignalUpdate, views::{button, stack, Decorators}, IntoView, View
+    keyboard::{Key, NamedKey},reactive::SignalUpdate, views::{button, stack, Decorators}, IntoView, View,
 };
 use crate::window::component::EditorComponents;
 use crate::components::navbar::navbar;
