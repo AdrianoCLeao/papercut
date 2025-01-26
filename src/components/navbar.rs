@@ -7,21 +7,6 @@ fn right(window_maximized: RwSignal<bool>, window_id: WindowId) -> impl View {
     let text_color = Color::rgb8(0x7A, 0x7A, 0x7A);
     stack((
         drag_window_area(empty()).style(|s| s.height_pct(100.0).flex_basis(0.0).flex_grow(1.0)),
-        stack((container(label(|| "1".to_string()).style(move |s| {
-            s.font_size(10.0)
-                .color(text_color)
-                .border_radius(100.0)
-                .margin_left(5.0)
-                .margin_top(10.0)
-                .background(background_color)
-        }))
-        .style(move |s| {
-            s.absolute()
-                .size_pct(100.0, 100.0)
-                .justify_end()
-                .items_end()
-        }),))
-        .style(move |s| s.margin_horiz(6.0)),
         window_controls_view(window_maximized, window_id),
     ))
     .style(|s| {
@@ -54,15 +39,49 @@ pub fn navbar(window_id: WindowId) -> Stack {
 
 pub fn window_controls_view(window_maximized: RwSignal<bool>, window_id: WindowId) -> impl View {
     stack((
-        button("Minimize".to_string())
-            .style(|s| s.margin_right(16.0).margin_left(10.0))
+        button("─".to_string())
+        .style(|s| {
+            s.margin_right(8.0)
+                .size(30.0, 30.0)
+                .justify_center() 
+                .items_center()
+                .background(Color::rgb8(31, 31, 31)) 
+                .color(Color::rgb8(122, 122, 122))
+                .hover(|s| {
+                    s.background(Color::rgb8(43, 43, 43))
+                        .color(Color::rgb8(122, 122, 122))
+                        .border_color(Color::rgb8(43, 43, 43)) 
+                })
+                .border_color(Color::rgb8(31, 31, 31))
+                .font_bold()
+                .border_radius(0)
+                .padding(1.0)
+            })
             .on_click(move |_| {
                 floem::action::minimize_window();
                 EventPropagation::Continue
             }),
 
-        button("Maximize".to_string())
-            .style(|s| s.margin_right(16.0))
+        button("🗗".to_string())
+        .style(|s| {
+            s.margin_right(8.0)
+                .size(30.0, 30.0)
+                .justify_center() 
+                .items_center()
+                .background(Color::rgb8(31, 31, 31)) 
+                .color(Color::rgb8(122, 122, 122))
+                .hover(|s| {
+                    s.background(Color::rgb8(43, 43, 43))
+                        .color(Color::rgb8(122, 122, 122))
+                        .border_color(Color::rgb8(43, 43, 43)) 
+                })
+                .border_color(Color::rgb8(31, 31, 31))
+                .border_radius(0)
+                .padding(1.0)
+                .padding_horiz(4.0)
+                .padding_bottom_pct(4.0)
+                .font_size(14.0)
+            })
             .on_click({
                 let window_maximized = window_maximized.clone();
                 move |_| {
@@ -73,8 +92,26 @@ pub fn window_controls_view(window_maximized: RwSignal<bool>, window_id: WindowI
                 }
             }),
 
-        button("Close".to_string())
-            .style(|s| s.margin_right(6.0))
+        button("X".to_string())
+        .style(|s| {
+            s.margin_right(8.0)
+                .size(30.0, 30.0)
+                .justify_center() 
+                .items_center()
+                .background(Color::rgb8(31, 31, 31)) 
+                .color(Color::rgb8(122, 122, 122))
+                .hover(|s| {
+                    s.background(Color::rgb8(43, 43, 43))
+                        .color(Color::rgb8(122, 122, 122))
+                        .border_color(Color::rgb8(43, 43, 43)) 
+                })
+                .border_color(Color::rgb8(31, 31, 31))
+                .border_radius(0)
+                .padding(1.0)
+                .padding_horiz(4.0)
+                .font_size(14.0)
+                .font_bold()
+            })
             .on_click(move |_| {
                 floem::close_window(window_id);
                 EventPropagation::Continue
