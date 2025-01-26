@@ -1,10 +1,8 @@
 use floem::{
-    event::EventPropagation, peniko::Color, prelude::{create_rw_signal, RwSignal, SignalGet}, taffy::JustifyContent, views::{button, container, drag_window_area, empty, label, stack, Decorators, Stack}, window::WindowId, View
+    event::EventPropagation, peniko::Color, prelude::{create_rw_signal, RwSignal, SignalGet}, taffy::JustifyContent, views::{button, drag_window_area, empty, label, stack, Decorators, Stack}, window::WindowId, View
 };
 
 fn right(window_maximized: RwSignal<bool>, window_id: WindowId) -> impl View {
-    let background_color = Color::rgb8(0xFF, 0x00, 0x00);
-    let text_color = Color::rgb8(0x7A, 0x7A, 0x7A);
     stack((
         drag_window_area(empty()).style(|s| s.height_pct(100.0).flex_basis(0.0).flex_grow(1.0)),
         window_controls_view(window_maximized, window_id),
