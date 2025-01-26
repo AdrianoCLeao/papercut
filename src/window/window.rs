@@ -1,7 +1,10 @@
 use floem::{
-    keyboard::{Key, NamedKey}, peniko::Color, reactive::SignalUpdate, views::{button, container, stack, Decorators}, IntoView, View
+    keyboard::{Key, NamedKey},reactive::SignalUpdate, views::{button, stack, Decorators}, IntoView, View
 };
 use crate::window::component::EditorComponents;
+use crate::components::navbar::navbar;
+use crate::components::left_panel::left_panel;
+use crate::components::right_panel::right_panel;
 
 pub fn create_window(components: EditorComponents) -> impl IntoView {
     let EditorComponents {
@@ -12,16 +15,9 @@ pub fn create_window(components: EditorComponents) -> impl IntoView {
         hide_gutter_b,
     } = components;
 
-    let color = Color::rgb8(0x28, 0x2C, 0x34);
-
-    let top_bar = container("Top Bar")
-        .style(move |s| s.height(50.0).width_full().background(color));
-
-    let left_sidebar = container("Left Sidebar")
-        .style(move |s| s.width(100.0).height_full().background(color));
-
-    let right_sidebar = container("Right Sidebar")
-        .style(move |s| s.width(100.0).height_full().background(color));
+    let navbar = navbar();
+    let left_sidebar = left_panel();
+    let right_sidebar = right_panel();
 
     let main_content = stack((
         editor_a,
@@ -44,7 +40,7 @@ pub fn create_window(components: EditorComponents) -> impl IntoView {
     .style(|s| s.size_full().flex_col().items_center().justify_center());
 
     let layout = stack((
-        top_bar,
+        navbar,
         stack((
             left_sidebar,
             main_content.style(|s| s.flex()), 
