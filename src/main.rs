@@ -1,5 +1,3 @@
-use std::any::Any;
-
 use floem::{kurbo::Size, window::WindowConfig, Application};
 use window::{component::create_editors, window::create_window};
 

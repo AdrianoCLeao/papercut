@@ -1,5 +1,5 @@
 use floem::{
-    action, event::EventPropagation, peniko::Color, prelude::{create_rw_signal, RwSignal, SignalGet}, reactive::create_memo, taffy::JustifyContent, views::{button, container, drag_window_area, empty, label, stack, Decorators, Stack}, window::WindowId, View
+    event::EventPropagation, peniko::Color, prelude::{create_rw_signal, RwSignal, SignalGet}, taffy::JustifyContent, views::{button, container, drag_window_area, empty, label, stack, Decorators, Stack}, window::WindowId, View
 };
 
 fn right(window_maximized: RwSignal<bool>, window_id: WindowId) -> impl View {
@@ -22,7 +22,7 @@ fn right(window_maximized: RwSignal<bool>, window_id: WindowId) -> impl View {
                 .items_end()
         }),))
         .style(move |s| s.margin_horiz(6.0)),
-        window_controls_view(true, window_maximized, window_id),
+        window_controls_view(window_maximized, window_id),
     ))
     .style(|s| {
         s.flex_basis(0)
@@ -41,9 +41,6 @@ pub fn navbar(window_id: WindowId) -> Stack {
         .style(move |s| s.font_size(14.0).color(text_color).padding(10.0));
 
     stack((navbar_title, right(window_maximized, window_id)))
-        .on_resize(move |rect| {
-            let height = rect.height();
-        })
         .style(move |s| {
             s.width_pct(100.0)
                 .height(37.0)
@@ -55,7 +52,7 @@ pub fn navbar(window_id: WindowId) -> Stack {
         .debug_name("Title / Top Bar")
 }
 
-pub fn window_controls_view(is_title: bool, window_maximized: RwSignal<bool>, window_id: WindowId) -> impl View {
+pub fn window_controls_view(window_maximized: RwSignal<bool>, window_id: WindowId) -> impl View {
     stack((
         button("Minimize".to_string())
             .style(|s| s.margin_right(16.0).margin_left(10.0))
