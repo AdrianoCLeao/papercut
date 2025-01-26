@@ -1,13 +1,8 @@
 use floem::{
-    peniko::Color,
-    prelude::{create_rw_signal, RwSignal},
-    reactive::create_memo,
-    taffy::JustifyContent,
-    views::{button, container, drag_window_area, empty, label, stack, Decorators, Stack},
-    View,
+    action, event::EventPropagation, peniko::Color, prelude::{create_rw_signal, RwSignal, SignalGet}, reactive::create_memo, taffy::JustifyContent, views::{button, container, drag_window_area, empty, label, stack, Decorators, Stack}, window::WindowId, View
 };
 
-fn right(window_maximized: RwSignal<bool>) -> impl View {
+fn right(window_maximized: RwSignal<bool>, window_id: WindowId) -> impl View {
     let background_color = Color::rgb8(0xFF, 0x00, 0x00);
     let text_color = Color::rgb8(0x7A, 0x7A, 0x7A);
     stack((
@@ -27,7 +22,7 @@ fn right(window_maximized: RwSignal<bool>) -> impl View {
                 .items_end()
         }),))
         .style(move |s| s.margin_horiz(6.0)),
-        window_controls_view(true, window_maximized),
+        window_controls_view(true, window_maximized, window_id),
     ))
     .style(|s| {
         s.flex_basis(0)
@@ -37,7 +32,7 @@ fn right(window_maximized: RwSignal<bool>) -> impl View {
     .debug_name("Right of top bar")
 }
 
-pub fn navbar() -> Stack {
+pub fn navbar(window_id: WindowId) -> Stack {
     let background_color = Color::rgb8(0x1F, 0x1F, 0x1F);
     let text_color = Color::rgb8(0x7A, 0x7A, 0x7A);
     let window_maximized = create_rw_signal(false);
@@ -45,7 +40,7 @@ pub fn navbar() -> Stack {
     let navbar_title = label(|| "Navbar".to_string())
         .style(move |s| s.font_size(14.0).color(text_color).padding(10.0));
 
-    stack((navbar_title, right(window_maximized)))
+    stack((navbar_title, right(window_maximized, window_id)))
         .on_resize(move |rect| {
             let height = rect.height();
         })
@@ -60,10 +55,32 @@ pub fn navbar() -> Stack {
         .debug_name("Title / Top Bar")
 }
 
-pub fn window_controls_view(is_title: bool, window_maximized: RwSignal<bool>) -> impl View {
+pub fn window_controls_view(is_title: bool, window_maximized: RwSignal<bool>, window_id: WindowId) -> impl View {
     stack((
-        label(|| "Minimize".to_string()).style(|s| s.margin_right(16.0).margin_left(10.0)),
-        label(|| "Maximize".to_string()).style(|s| s.margin_right(16.0)),
-        label(|| "Close".to_string()).style(|s| s.margin_right(6.0)),
+        button("Minimize".to_string())
+            .style(|s| s.margin_right(16.0).margin_left(10.0))
+            .on_click(move |_| {
+                floem::action::minimize_window();
+                EventPropagation::Continue
+            }),
+
+        button("Maximize".to_string())
+            .style(|s| s.margin_right(16.0))
+            .on_click({
+                let window_maximized = window_maximized.clone();
+                move |_| {
+                    floem::action::set_window_maximized(
+                        !window_maximized.get_untracked(),
+                    );
+                    EventPropagation::Continue
+                }
+            }),
+
+        button("Close".to_string())
+            .style(|s| s.margin_right(6.0))
+            .on_click(move |_| {
+                floem::close_window(window_id);
+                EventPropagation::Continue
+            }),
     ))
 }
