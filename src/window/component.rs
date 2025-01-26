@@ -1,11 +1,10 @@
 use std::rc::Rc;
 
 use floem::{
-    keyboard::{Key, NamedKey}, prelude::SignalGet, reactive::{RwSignal, SignalUpdate}, views::{
-        button,
-        editor::{command::{Command, CommandExecuted}, core::{command::EditCommand, editor::EditType, selection::Selection}, text::{default_dark_color, Document, SimpleStyling}},
-        stack, text_editor, Decorators, TextEditor,
-    }, View
+    prelude::SignalGet, reactive::RwSignal, views::{
+        editor::{command::{Command, CommandExecuted}, core::command::EditCommand, text::{default_dark_color, Document, SimpleStyling}},
+        text_editor, Decorators, TextEditor,
+    },
 };
 
 pub struct EditorComponents {
@@ -44,7 +43,6 @@ pub fn create_editors() -> EditorComponents {
             CommandExecuted::No
         })
         .update(|_| {
-            println!("Editor changed");
         })
         .placeholder("Some placeholder text");
 
