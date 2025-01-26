@@ -1,74 +1,53 @@
-use winit::{
-    event::{Event, WindowEvent},
-    event_loop::{ControlFlow, EventLoop},
-    window::WindowBuilder,
+use floem::{
+    keyboard::{Key, NamedKey},
+    reactive::{RwSignal, SignalGet, SignalUpdate},
+    views::{
+        button,
+        editor::{
+            command::{Command, CommandExecuted},
+            core::{command::EditCommand, editor::EditType, selection::Selection},
+            text::{default_dark_color, SimpleStyling},
+        },
+        stack, text_editor, Decorators,
+    },
+    IntoView, View,
 };
-use crate::window::component::{Component, LayoutDirection};
 
-pub struct Window {
-    root: Component,
-    event_loop: EventLoop<()>,
-    winit_window: winit::window::Window,
-}
+use crate::window::component::EditorComponents;
 
-impl Window {
-    pub fn new(title: &str, width: u32, height: u32) -> Self {
-        let event_loop = EventLoop::new().unwrap();
-        let winit_window = WindowBuilder::new()
-            .with_title(title)
-            .with_inner_size(winit::dpi::LogicalSize::new(width, height))
-            .build(&event_loop)
-            .expect("Failed to create window");
+pub fn create_window(components: EditorComponents) -> impl IntoView{
+    let EditorComponents {
+        editor_a,
+        editor_b,
+        doc,
+        hide_gutter_a,
+        hide_gutter_b,
+    } = components;
 
-        let root_component = Component::new(
-            title,
-            Some(LayoutDirection::Vertical),
-            Some((width, height)),
-            Some((0, 0)),
-        );
+    let view = stack((
+        editor_a,
+        editor_b,
+        stack((
+            button("Clear").action(move || {
+                doc.edit_single(
+                    Selection::region(0, doc.text().len()),
+                    "",
+                    EditType::DeleteSelection,
+                );
+            }),
+            button("Flip Gutter").action(move || {
+                hide_gutter_a.update(|hide| *hide = !*hide);
+                hide_gutter_b.update(|hide| *hide = !*hide);
+            }),
+        ))
+        .style(|s| s.width_full().flex_row().items_center().justify_center()),
+    ))
+    .style(|s| s.size_full().flex_col().items_center().justify_center());
 
-        Window {
-            root: root_component,
-            event_loop,
-            winit_window,
-        }
-    }
-
-    pub fn add_component(&mut self, component: Component) {
-        self.root.add_child(component);
-    }
-
-    pub fn get_root(&self) -> &Component {
-        &self.root
-    }
-
-    pub fn run(self) {
-        let mut root = self.root;
-        let mut event_loop = self.event_loop;
-        let winit_window = self.winit_window;
-    
-        let _ = event_loop.run(|event, elwt| {
-            
-
-
-        });
-    }
-
-    fn render_component(&self, component: &Component, depth: usize) {
-        let indent = "  ".repeat(depth);
-        println!("{}Component: {}", indent, component.name);
-
-        for child in &component.children {
-            self.render_component(child, depth + 1);
-        }
-    }
-}
-
-fn render_component(component: &Component, depth: usize) {
-    let indent = "  ".repeat(depth);
-    println!("{}Component: {}", indent, component.name);
-
-    for child in &component.children {
-        render_component(child, depth + 1);
-    }
+    let id = view.id();
+    view.on_key_up(
+        Key::Named(NamedKey::F11),
+        |m| m.is_empty(),
+        move |_| id.inspect(),
+    )
 }
