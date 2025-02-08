@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 floem = {version = "0.2.0", features = ["rfd-async-std"]}
+strum = { version = "0.25.0", features = ["derive"] }

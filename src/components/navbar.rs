@@ -1,7 +1,18 @@
 use floem::{
-    action::{open_file, save_as}, event::EventPropagation, file::{FileDialogOptions, FileInfo, FileSpec}, peniko::Color, prelude::{create_rw_signal, RwSignal, SignalGet, SignalUpdate}, taffy::JustifyContent, text::Weight, views::{button, drag_window_area, empty, h_stack, label, stack, v_stack, Decorators, Stack}, window::WindowId, IntoView, View
+    action::{open_file, save_as},
+    event::EventPropagation,
+    file::{FileDialogOptions, FileInfo, FileSpec},
+    peniko::Color,
+    prelude::*,
+    reactive::{create_effect, create_rw_signal, RwSignal, SignalGet, SignalUpdate},
+    taffy::JustifyContent,
+    views::{button, drag_window_area, empty, h_stack, stack, Decorators, Stack},
+    window::WindowId,
+    IntoView, View,
 };
 
+use dropdown::Dropdown;
+use strum::IntoEnumIterator;
 
 fn right(window_maximized: RwSignal<bool>, window_id: WindowId) -> impl View {
     stack((
@@ -94,101 +105,79 @@ pub fn window_controls_view(window_maximized: RwSignal<bool>, window_id: WindowI
     ))
 }
 
+#[derive(strum::EnumIter, Debug, PartialEq, Clone, Copy)]
+enum FileAction {
+    File,
+    SelectFile,
+    SelectFolder,
+    SaveFile,
+}
+
+impl std::fmt::Display for FileAction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("{:?}", self))
+    }
+}
+
 pub fn left() -> impl IntoView {
     let files = create_rw_signal("".to_string());
+    let dropdown_selected_action = RwSignal::new(FileAction::SelectFile);
 
-    let view = h_stack((
-        button("Select file").on_click_cont(move |_| {
-            open_file(
-                FileDialogOptions::new()
-                    .force_starting_directory("/")
-                    .title("Select file")
-                    .allowed_types(vec![FileSpec {
-                        name: "text",
-                        extensions: &["txt", "rs", "md"],
-                    }]),
-                move |file_info| {
-                    if let Some(file) = file_info {
-                        println!("Selected file: {:?}", file.path);
-                        files.set(display_files(file));
-                    }
-                },
-            );
-        }),
-        button("Select multiple files").on_click_cont(move |_| {
-            open_file(
-                FileDialogOptions::new()
-                    .multi_selection()
-                    .title("Select file")
-                    .allowed_types(vec![FileSpec {
-                        name: "text",
-                        extensions: &["txt", "rs", "md"],
-                    }]),
-                move |file_info| {
-                    if let Some(file) = file_info {
-                        println!("Selected file: {:?}", file.path);
-                        files.set(display_files(file));
-                    }
-                },
-            );
-        }),
-        button("Select folder").on_click_cont(move |_| {
-            open_file(
-                FileDialogOptions::new()
-                    .select_directories()
-                    .title("Select Folder"),
-                move |file_info| {
-                    if let Some(file) = file_info {
-                        println!("Selected folder: {:?}", file.path);
-                        files.set(display_files(file));
-                    }
-                },
-            );
-        }),
-        button("Select multiple folder").on_click_cont(move |_| {
-            open_file(
-                FileDialogOptions::new()
-                    .select_directories()
-                    .multi_selection()
-                    .title("Select multiple Folder"),
-                move |file_info| {
-                    if let Some(file) = file_info {
-                        println!("Selected folder: {:?}", file.path);
-                        files.set(display_files(file));
-                    }
-                },
-            );
-        }),
-        button("Save file").on_click_cont(move |_| {
-            save_as(
-                FileDialogOptions::new()
-                    .default_name("floem.file")
-                    .title("Save file"),
-                move |file_info| {
-                    if let Some(file) = file_info {
-                        println!("Save file to: {:?}", file.path);
-                        files.set(display_files(file));
-                    }
-                },
-            );
-        }),
-    ))
-    .style(|s| s.justify_center());
+    create_effect(move |_| {
+        match dropdown_selected_action.get() {
+            FileAction::File => {
+                println!("File");
+            }
+            FileAction::SelectFile => {
+                open_file(
+                    FileDialogOptions::new()
+                        .force_starting_directory("/")
+                        .title("Select file")
+                        .allowed_types(vec![FileSpec {
+                            name: "text",
+                            extensions: &["txt", "rs", "md"],
+                        }]),
+                    move |file_info| {
+                        if let Some(file) = file_info {
+                            println!("Selected file: {:?}", file.path);
+                            files.set(display_files(file));
+                        }
+                    },
+                );
+            }
+            FileAction::SelectFolder => {
+                open_file(
+                    FileDialogOptions::new()
+                        .select_directories()
+                        .title("Select Folder"),
+                    move |file_info| {
+                        if let Some(file) = file_info {
+                            println!("Selected folder: {:?}", file.path);
+                            files.set(display_files(file));
+                        }
+                    },
+                );
+            }
+            FileAction::SaveFile => {
+                save_as(
+                    FileDialogOptions::new()
+                        .default_name("floem.file")
+                        .title("Save file"),
+                    move |file_info| {
+                        if let Some(file) = file_info {
+                            println!("Save file to: {:?}", file.path);
+                            files.set(display_files(file));
+                        }
+                    },
+                );
+            }
+        }
+    });
 
-    v_stack((
-        view,
-        h_stack((
-            "Path(s): ".style(|s| s.font_weight(Weight::BOLD)),
-            label(move || files.get()),
-        )),
-    ))
-    .style(|s| {
-        s.row_gap(5)
-         .width_full()
-         .height_full()
-         .items_center()
-         .justify_center()
-    })
+    let dropdown = Dropdown::new_rw(dropdown_selected_action, FileAction::iter());
+
+    h_stack((dropdown,)).style(|s| s.justify_center())
+
 }
 
 fn display_files(file: FileInfo) -> String {
