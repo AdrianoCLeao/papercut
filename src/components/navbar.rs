@@ -174,7 +174,25 @@ pub fn left() -> impl IntoView {
         }
     });
 
-    let dropdown = Dropdown::new_rw(dropdown_selected_action, FileAction::iter());
+    let dropdown = Dropdown::new_rw(dropdown_selected_action, FileAction::iter()) 
+        .style(|s| {
+            s.margin_right(8.0)
+                .size(100.0, 30.0)
+                .justify_center()
+                .items_center()
+                .background(Color::rgb8(31, 31, 31))
+                .color(Color::rgb8(122, 122, 122)) 
+                .hover(|s| {
+                    s.background(Color::rgb8(43, 43, 43)) 
+                        .color(Color::rgb8(122, 122, 122))
+                        .border_color(Color::rgb8(43, 43, 43))
+                })
+                .border_color(Color::rgb8(31, 31, 31))
+                .border_radius(0)
+                .padding(1.0)
+                .font_bold()
+        });
+        
 
     h_stack((dropdown,)).style(|s| s.justify_center())
 
