@@ -121,7 +121,7 @@ impl std::fmt::Display for FileAction {
 
 pub fn left() -> impl IntoView {
     let files = create_rw_signal("".to_string());
-    let dropdown_selected_action = RwSignal::new(FileAction::SelectFile);
+    let dropdown_selected_action = RwSignal::new(FileAction::File);
 
     create_effect(move |_| {
         match dropdown_selected_action.get() {
