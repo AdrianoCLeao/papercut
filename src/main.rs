@@ -3,6 +3,7 @@ use window::{component::create_editors, window::create_window};
 
 mod window;
 mod components;
+mod icons;
 
 fn main() {
     let editors = create_editors();

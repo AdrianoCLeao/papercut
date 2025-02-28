@@ -14,6 +14,8 @@ use floem::{
 use dropdown::Dropdown;
 use strum::IntoEnumIterator;
 
+use crate::icons::svg;
+
 fn right(window_maximized: RwSignal<bool>, window_id: WindowId) -> impl View {
     stack((
         drag_window_area(empty()).style(|s| s.height_pct(100.0).flex_basis(0.0).flex_grow(1.0)),
@@ -29,10 +31,9 @@ fn right(window_maximized: RwSignal<bool>, window_id: WindowId) -> impl View {
 
 pub fn window_controls_view(window_maximized: RwSignal<bool>, window_id: WindowId) -> impl View {
     stack((
-        button("─".to_string())
+        button(svg(svg::BACKWARD).class(ButtonClass))
             .style(|s| {
                 s.margin_right(8.0)
-                    .size(30.0, 30.0)
                     .justify_center()
                     .items_center()
                     .background(Color::rgb8(31, 31, 31))
@@ -51,7 +52,7 @@ pub fn window_controls_view(window_maximized: RwSignal<bool>, window_id: WindowI
                 floem::action::minimize_window();
                 EventPropagation::Continue
             }),
-        button("🗗".to_string())
+        button(svg(svg::MAXIMIZE).class(ButtonClass))
             .style(|s| {
                 s.margin_right(8.0)
                     .size(30.0, 30.0)
@@ -78,7 +79,7 @@ pub fn window_controls_view(window_maximized: RwSignal<bool>, window_id: WindowI
                     EventPropagation::Continue
                 }
             }),
-        button("X".to_string())
+        button(svg(svg::CLOSE).class(ButtonClass))
             .style(|s| {
                 s.margin_right(8.0)
                     .size(30.0, 30.0)
